@@ -57,6 +57,7 @@ const std::vector<D2PopupInfo> g_popups = {
 	{ { 256, 176 }, {   8, 176 } }, // popupok.dc6 // passwordbox.dc6 // PopUpOKCancel.DC6
 	{ { 256, 200 }, {  70, 200 } }, // DifficultyLevels.dc6
 	{ { 256, 256 }, {   0,   0 } }, // TileableDialog.dc6
+	{ { 256, 220 }, {   74,   220 } }, // Median DifficultyLevels
 };
 
 const std::vector<D2TextInfo> g_options_texts = {
