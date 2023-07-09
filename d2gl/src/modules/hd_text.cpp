@@ -222,7 +222,7 @@ bool HDText::drawText(const wchar_t* str, int x, int y, uint32_t color, uint32_t
 
 	m_fonts[font.id]->setBoxed(false);
 	m_fonts[font.id]->setMasking(m_masking);
-	m_fonts[font.id]->setAlign(TextAlign::Left);
+	m_fonts[font.id]->setAlign(centered ? TextAlign::Center : TextAlign::Left);
 	m_fonts[font.id]->drawText(str, pos, text_color);
 	m_fonts[font.id]->setStroke(0);
 
@@ -428,6 +428,21 @@ bool HDText::drawSolidRect(int left, int top, int right, int bottom, uint32_t co
 	if (color != 0) // skip drawing except black color
 		return false;
 
+	if (draw_mode == 5 && height == 7) // median exp bar
+		return false;
+	if (draw_mode == 1 && width == 1024) // median esc
+		return false;
+	if (draw_mode == 1 && height == 53 && width == 124) // median skilltab
+		return false;
+	if (draw_mode == 5 && height == 48 && width == 48) // median skill bar
+		return false;
+	if (draw_mode == 5 && height == 40 && width == 428) // median waypoint buttons
+		return false;
+	if (draw_mode == 5 && height == 23 && width == 146) // median interface theme arrow
+		return false;
+	if (draw_mode == 2 && height == 20 && width == 45) //overhead merc
+		return false;
+
 	if (draw_mode == 5 && height == 5 && top == 14) // hireling & summon hp
 		return false;
 
@@ -437,8 +452,8 @@ bool HDText::drawSolidRect(int left, int top, int right, int bottom, uint32_t co
 	if ((*d2::screen_shift == 2 || *d2::screen_shift == 3) && width == 320 && (height == 432 || height == 236)) // Plugy stats panel bg
 		return false;
 
-	if (draw_mode == 2 && width == 24 && height <= 24) // PD2 buff timer bg
-		return false;
+	//if (draw_mode == 2 && width == 24 && height <= 24) // PD2 buff timer bg
+	//	return false;
 
 	if (*d2::esc_menu_open && height == 30) // In-game option sliders
 		return false;
@@ -875,7 +890,7 @@ void HDText::drawFpsCounter()
 
 	d2::setTextSizeHooked(99);
 	const auto width = d2::getNormalTextWidthHooked(str);
-	d2::drawNormalTextHooked(str, App.game.size.x / 2 - width / 2, App.game.size.y - 54, 4, 0);
+	d2::drawNormalTextHooked(str, App.game.size.x / 2 - width / 2, App.game.size.y - 3, 4, 0); // mxl
 	d2::setTextSizeHooked(1);
 }
 

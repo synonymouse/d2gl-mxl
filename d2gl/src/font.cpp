@@ -179,8 +179,10 @@ void Font::drawText(const wchar_t* str, glm::vec2 pos, uint32_t color)
 	const float letter_spacing = getLetterSpacing();
 	const auto padding = getTextOffset();
 	const float paddind_x = m_boxed ? m_rtrim_size * m_size : padding.x;
+	const float paddind_y = m_boxed ? padding.y + (float)m_line_count * line_height : padding.y;
 
-	glm::vec2 offset = { paddind_x, padding.y + (float)m_line_count * line_height };
+
+	glm::vec2 offset = { paddind_x, paddind_y };
 	if (m_align == TextAlign::Right)
 		offset.x += m_text_size.x - m_line_width[0];
 	else if (m_align == TextAlign::Center)
