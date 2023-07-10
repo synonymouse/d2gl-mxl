@@ -113,6 +113,7 @@ uintptr_t getLevelName_Fn = getProc((DLL_D2CLIENT), (0x88420), (0x839F0), (0x9DC
 
 //mxl
 uintptr_t d2ClientUIStartJmp_O = getProc((DLL_D2CLIENT), (), (), (), (), (), (0x4437B), (), ());
+uintptr_t d2ClientPtr1_O = getProc((DLL_D2CLIENT), (), (), (), (), (), (0x11C3C4), (), ());
 AutomapStart_t AutomapStart = (AutomapStart_t)getProc((DLL_D2CLIENT), (), (), (), (), (), (0x60C40), (), ()); // automap start: walls etc
 AutomapEnd_t AutomapEnd = (AutomapEnd_t)getProc((DLL_D2CLIENT), (), (), (), (), (), (0x5C5C0), (), ()); // overlays end
 

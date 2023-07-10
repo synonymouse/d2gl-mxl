@@ -87,7 +87,8 @@ __declspec(naked) void uiDrawBeginStub() // mxl
 	//}
 	__asm
 	{
-		mov edx, DWORD PTR DS : [0x6FBCC3C4]
+		mov edx, DWORD PTR DS : [d2ClientPtr1_O]
+		mov edx, DWORD PTR DS: [edx]
 		push edx
 		pushad
 		call uiDrawBegin

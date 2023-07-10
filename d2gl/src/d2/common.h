@@ -116,6 +116,7 @@ extern int* automap_type;
 extern uintptr_t d2ClientFn1_O;
 extern uintptr_t d2ClientFn2_O;
 extern uintptr_t d2ClientUIStartJmp_O;
+extern uintptr_t d2ClientPtr1_O;
 
 extern findUnit_t findUnitClient;
 extern findUnit_t findUnitServer;
