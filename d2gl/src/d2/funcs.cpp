@@ -360,8 +360,7 @@ uint32_t __fastcall getNormalTextWidthHooked(const wchar_t* str)
 
 uint32_t __fastcall getNormalTextNWidthHooked(const wchar_t* str, const int n_chars)
 {
-	//trace_log("%ws n_chars: %i", str, n_chars);
-	if (wcscmp(str, L"Levels") == 0 || wcscmp(str, L"Le") == 0 || wcscmp(str, L"vels") == 0) // mxl n_chars == 0; n_chars == 255;
+	if (wcscmp(str, L"") == 0 || n_chars <= 3)
 		return getNormalTextNWidth(str, n_chars);
 
 	if (modules::HDText::Instance().isActive())
