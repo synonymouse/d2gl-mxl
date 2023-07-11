@@ -65,17 +65,6 @@ __declspec(naked) void gameDrawBeginStub()
 //	}
 //}
 
-//__declspec(naked) void uiDrawBeginStub()
-//{
-//	__asm
-//	{
-//		pushad
-//		call uiDrawBegin
-//		popad
-//		ret
-//	}
-//}
-
 __declspec(naked) void uiDrawBeginStub() // mxl
 {
 	//__asm
@@ -88,12 +77,23 @@ __declspec(naked) void uiDrawBeginStub() // mxl
 	__asm
 	{
 		mov edx, DWORD PTR DS : [d2ClientPtr1_O]
-		mov edx, DWORD PTR DS: [edx]
+		mov edx, DWORD PTR DS : [edx]
 		push edx
 		pushad
 		call uiDrawBegin
 		popad
 		jmp d2ClientUIStartJmp_O;
+	}
+}
+
+__declspec(naked) void uiDrawCursorItemStub()
+{
+	__asm
+	{
+		pushad
+		call uiDrawCursorItem
+		popad
+		ret
 	}
 }
 
@@ -318,6 +318,31 @@ __declspec(naked) void rectangledTextBeginStub()
 {
 	__asm
 	{
+		mov headsup_text_unit, edx
+		pushad
+		call rectangledTextBegin
+		popad
+		ret
+	}
+}
+
+__declspec(naked) void rectangledTextBeginStub110f()
+{
+	__asm
+	{
+		mov headsup_text_unit, ecx
+		pushad
+		call rectangledTextBegin
+		popad
+		ret
+	}
+}
+
+__declspec(naked) void rectangledTextBeginStub109d()
+{
+	__asm
+	{
+		mov headsup_text_unit, ebp
 		pushad
 		call rectangledTextBegin
 		popad
