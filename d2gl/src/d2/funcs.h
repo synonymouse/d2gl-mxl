@@ -92,5 +92,8 @@ void drawSubTextA();
 void drawSubTextB();
 void drawSubTextC();
 void levelEntryText();
+//mxl
+void __fastcall AutomapStartHooked();
+void __fastcall AutomapEndHooked();
 
 }

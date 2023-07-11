@@ -41,38 +41,48 @@ __declspec(naked) void gameDrawBeginStub()
 	}
 }
 
-__declspec(naked) void automapDrawBeginStub()
-{
-	__asm
-	{
-		call d2ClientFn1_O
-		pushad
-		call automapDrawBegin
-		popad
-		ret
-	}
-}
+//__declspec(naked) void automapDrawBeginStub()
+//{
+//	__asm
+//	{
+//		call d2ClientFn1_O
+//		pushad
+//		call automapDrawBegin
+//		popad
+//		ret
+//	}
+//}
+//
+//__declspec(naked) void automapDrawEndStub()
+//{
+//	__asm
+//	{
+//		pushad
+//		call automapDrawEnd
+//		popad
+//		call d2ClientFn2_O
+//		ret
+//	}
+//}
 
-__declspec(naked) void automapDrawEndStub()
+__declspec(naked) void uiDrawBeginStub() // mxl
 {
+	//__asm
+	//{
+	//	pushad
+	//	call uiDrawBegin
+	//	popad
+	//	ret
+	//}
 	__asm
 	{
-		pushad
-		call automapDrawEnd
-		popad
-		call d2ClientFn2_O
-		ret
-	}
-}
-
-__declspec(naked) void uiDrawBeginStub()
-{
-	__asm
-	{
+		mov edx, DWORD PTR DS : [d2ClientPtr1_O]
+		mov edx, DWORD PTR DS : [edx]
+		push edx
 		pushad
 		call uiDrawBegin
 		popad
-		ret
+		jmp d2ClientUIStartJmp_O;
 	}
 }
 

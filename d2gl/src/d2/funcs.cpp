@@ -360,6 +360,9 @@ uint32_t __fastcall getNormalTextWidthHooked(const wchar_t* str)
 
 uint32_t __fastcall getNormalTextNWidthHooked(const wchar_t* str, const int n_chars)
 {
+	if (wcscmp(str, L"Levels") == 0) // mxl n_chars == 0; n_chars == 255;
+		return getNormalTextNWidth(str, n_chars);
+
 	if (modules::HDText::Instance().isActive())
 		return modules::HDText::Instance().getNormalTextWidth(str, n_chars);
 	return getNormalTextNWidth(str, n_chars);
@@ -436,6 +439,18 @@ void drawSubTextC()
 void levelEntryText()
 {
 	modules::HDText::Instance().startEntryText();
+}
+//mxl
+void __fastcall AutomapStartHooked()
+{
+	automapDrawBegin();
+	return AutomapStart();
+}
+
+void  __fastcall AutomapEndHooked()
+{
+	automapDrawEnd();
+	return AutomapEnd();
 }
 
 }
