@@ -166,6 +166,21 @@ bool HDText::drawText(const wchar_t* str, int x, int y, uint32_t color, uint32_t
 	const auto def_color = font->getColor();
 	uint32_t text_color = g_text_colors.at(!color && def_color ? def_color : getColor(color));
 
+	//trace_log("%ws x: %i, y: %i, %i, %i", str, x, y, m_text_size, *d2::screen_shift);
+	//if (m_text_size == 1) {
+	//	if (*d2::screen_shift != SCREENPANEL_NONE) {
+	//		if (y == 680 && (x == 84 || x == 915))
+	//			pos.x += 5.0f;
+	//			pos.y -= 2.0f;
+	//		if ((x == 52 && y == 92) || (x == 42 && 156))
+	//			pos.x += 5.0f;
+	//			pos.y -= 2.0f;
+	//	} else {
+	//		pos.x += 5.0f;
+	//		pos.y -= 2.0f;	
+	//	}
+	//}
+
 	if (App.game.screen == GameScreen::Menu) {
 		if (m_text_size == 1) {
 			if (x == 113 || x == 385) {
@@ -249,11 +264,11 @@ bool HDText::drawText(const wchar_t* str, int x, int y, uint32_t color, uint32_t
 		App.context->pushObject(m_object_bg);
 		font->setShadow(2);
 	}
-
+	if (App.game.screen != GameScreen::Menu && m_text_size != 6 && centered) {
+		pos.x += 6.0f;
+	}
 	font->setMasking(m_masking);
 	font->setAlign(centered ? TextAlign::Center : TextAlign::Left);
-	if (x == 582 && y == 657) // gold
-		font->setAlign(TextAlign::Left);
 	font->drawText(str, pos, text_color);
 	if (map_text) {
 		App.context->toggleDelayPush(false);
@@ -494,7 +509,8 @@ bool HDText::drawSolidRect(int left, int top, int right, int bottom, uint32_t co
 
 	if (draw_mode == 5 && height == 5 && top == 14) // hireling & summon hp
 		return false;
-
+	if (draw_mode == 5 && height == 256 && top == 153) // median drop deposit
+		return false;
 	if (width == App.game.size.x || height == App.game.size.y) // FreeRes black bars
 		return false;
 
