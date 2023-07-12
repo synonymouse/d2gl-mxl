@@ -65,10 +65,10 @@ void MiniMap::draw()
 			App.context->pushObject(m_map);
 		}
 
-		if (App.hd_text && d2::screen_shift == 0) {
+		if (App.hd_text && !d2::automapenabled) {
 			time_t now = time(0);
 			localtime_s(&gmt_time, &now);
-			swprintf_s(time_str, L" %.2d:%.2d", gmt_time.tm_hour, gmt_time.tm_min);
+			swprintf_s(time_str, L"%.2d:%.2d", gmt_time.tm_hour, gmt_time.tm_min);
 
 			const auto old_size = modules::HDText::Instance().getTextSize();
 			d2::setTextSizeHooked(19);
