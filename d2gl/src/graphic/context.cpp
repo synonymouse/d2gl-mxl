@@ -703,6 +703,14 @@ void Context::onStageChange()
 				setVertexFlagW(1 + !d2::automapenabled);
 			}
 			break;
+		case DrawStage::Map2:
+			if (modules::MiniMap::Instance().isActive()) {
+				flushVertices();
+				m_blend_locked = false;
+				m_command_buffer[m_frame_index].pushCommand(CommandType::SetBlendState, m_current_blend_index);
+				setVertexFlagW(0);
+			}
+			break;
 		case DrawStage::HUD:
 			if (modules::MiniMap::Instance().isActive()) {
 				flushVertices();

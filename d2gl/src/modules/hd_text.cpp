@@ -160,7 +160,7 @@ bool HDText::drawText(const wchar_t* str, int x, int y, uint32_t color, uint32_t
 	if (!isActive() || !str)
 		return false;
 
-	if (y > 700 && y != 765 && y != 729 && App.game.screen != GameScreen::Menu)
+	if (y > 700 && (x == 195 || x == 200) && App.game.screen != GameScreen::Menu)
 		return false;
 	auto font = getFont(m_text_size);
 	font->setShadow(1);

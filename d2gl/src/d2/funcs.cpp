@@ -218,7 +218,7 @@ void __stdcall drawImageHooked(CellContext* cell, int x, int y, uint32_t gamma, 
 	if (App.hd_cursor && App.game.draw_stage >= DrawStage::Cursor)
 		return;
 	if (App.game.draw_stage == DrawStage::Map) {
-		App.game.draw_stage = DrawStage::HUD;
+		App.game.draw_stage = DrawStage::Map2;
 		App.context->onStageChange();
 	}
 	if (modules::HDText::Instance().drawImage(cell, x, y, draw_mode)) {
