@@ -136,6 +136,7 @@ UnitAny* headsup_text_unit = nullptr;
 std::unique_ptr<Patch> patch_minimap;
 std::unique_ptr<Patch> patch_motion_prediction;
 std::unique_ptr<Patch> patch_hd_text;
+bool automapenabled;
 
 void initHooks()
 {
@@ -185,7 +186,7 @@ void initHooks()
 	if (ISGLIDE3X()) {
 		patch_minimap = std::make_unique<Patch>();
 		patch_minimap->add(PatchType::Nop, getOffset((DLL_D2CLIENT, 0x740E833D), (0x8678F, 0x740FE87A), (0x81D5D, 0x740FE8EC), (0xA36A1), (0x66AA1), (0x90201), (0xC3A91), (0x1D491), (0x56F99, 0x740FE8F0)), 2);
-		App.mini_map.available = false; //automap_loop.isActive() && patch_minimap->prepare();
+		App.mini_map.available = automap_loop.isActive() && patch_minimap->prepare();
 		if (App.mini_map.available)
 			patch_minimap->toggle(App.mini_map.active);
 		else

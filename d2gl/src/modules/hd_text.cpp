@@ -160,6 +160,8 @@ bool HDText::drawText(const wchar_t* str, int x, int y, uint32_t color, uint32_t
 	if (!isActive() || !str)
 		return false;
 
+	if (y > 700 && y != 765 && y != 729 && App.game.screen != GameScreen::Menu)
+		return false;
 	auto font = getFont(m_text_size);
 	font->setShadow(1);
 	glm::vec2 pos = { (float)x, (float)y };
@@ -204,27 +206,24 @@ bool HDText::drawText(const wchar_t* str, int x, int y, uint32_t color, uint32_t
 		pos.y += font->getFontSize() * 0.08f;
 
 	static bool map_text = false;
+
 	if (App.game.draw_stage == DrawStage::Map && modules::MiniMap::Instance().isActive()) {
-		if (m_text_size == 6 && !*d2::automap_on) {
+		if (m_text_size == 6 && !d2::automapenabled) {
 			m_map_names = true;
 			return false;
-		} else if (m_text_size != 6) {
-			if (*d2::screen_shift != SCREENPANEL_NONE)
-				return true;
-
+		} 
+	}
+	if (App.game.draw_stage == DrawStage::HUD && modules::MiniMap::Instance().isActive() && *d2::screen_shift == SCREENPANEL_NONE) {
+		if (!d2::automapenabled && m_text_size == 1 && x > 700 && y < 300) {
 			map_text = true;
 			App.context->toggleDelayPush(true);
 
-			bool hidden = *d2::automap_on || d2::isEscMenuOpen();
-			font = getFont(m_map_text_line == 1 || !App.mini_map.text_over || hidden ? 19 : 6);
+			bool hidden = d2::automapenabled || d2::isEscMenuOpen();
+			font = getFont(!App.mini_map.text_over || hidden ? 19 : 6);
 			const auto size = font->getTextSize(str);
 
-			if (m_map_text_line == 1) {
-				pos.x = App.game.size.x - modules::MiniMap::Instance().getTimeWidth() - size.x - 5.0f;
-				pos.y = 13.0f;
-			} else {
 				pos.x = App.game.size.x - 12.0f - size.x;
-				pos.y = 10.0f + m_map_text_line * font->getFontSize() * 1.34f;
+				pos.y = 22.0f + m_map_text_line * font->getFontSize() * 1.34f;
 				if (hidden) {
 					pos.x += 7.0f;
 					pos.y -= 10.0f;
@@ -232,10 +231,12 @@ bool HDText::drawText(const wchar_t* str, int x, int y, uint32_t color, uint32_t
 					pos.x += 7.0f;
 					pos.y += (float)App.mini_map.height.value - 5.0f;
 				}
-			}
+
+				m_text_size = 99;
 			m_map_text_line++;
 		}
 	}
+
 
 	if (m_text_size == 13 && (x == 15 || (*d2::screen_shift == SCREENPANEL_LEFT && x == App.game.size.x / 2 + 15))) {
 		auto size = font->getTextSize(str);
@@ -249,17 +250,22 @@ bool HDText::drawText(const wchar_t* str, int x, int y, uint32_t color, uint32_t
 		App.context->pushObject(m_object_bg);
 		font->setShadow(2);
 	}
-	if (App.game.screen != GameScreen::Menu && m_text_size != 6 && centered) {
+	if (App.game.screen != GameScreen::Menu && m_text_size == 1 && centered) {
 		pos.x += 6.0f;
 	}
+	if (m_text_size == 4)
+		pos.y += 2;
 	font->setMasking(m_masking);
 	font->setAlign(centered ? TextAlign::Center : TextAlign::Left);
 	font->drawText(str, pos, text_color);
+	//pos.x -= 10;
+	//wchar_t test[3];
+	//swprintf_s(test, L"%d", m_text_size);
+	//font->drawText(test, pos, text_color);
 	if (map_text) {
 		App.context->toggleDelayPush(false);
 		map_text = false;
 	}
-
 	return true;
 }
 
@@ -477,37 +483,41 @@ bool HDText::drawSolidRect(int left, int top, int right, int bottom, uint32_t co
 	if (color != 0) // skip drawing except black color
 		return false;
 
-	if (draw_mode == 5 && height == 7) // median exp bar
-		return false;
-	if (draw_mode == 1 && width == 1024) // median esc
-		return false;
-	if (draw_mode == 1 && height == 53 && width == 124) // median skilltab
-		return false;
-	if (draw_mode == 5 && height == 48 && width == 48) // median skill bar
-		return false;
-	if (draw_mode == 5 && height == 40 && width == 428) // median waypoint buttons
-		return false;
-	if (draw_mode == 5 && height == 23 && width == 146) // median interface theme arrow
-		return false;
-	if (draw_mode == 2 && height == 20 && width == 45) //overhead merc
-		return false;
-
-	if (draw_mode == 5 && height == 5 && top == 14) // hireling & summon hp
-		return false;
-	if (draw_mode == 5 && height == 256 && top == 153) // median drop deposit
-		return false;
-	if (width == App.game.size.x || height == App.game.size.y) // FreeRes black bars
-		return false;
-
-	if ((*d2::screen_shift == SCREENPANEL_LEFT || *d2::screen_shift == SCREENPANEL_BOTH) && width == 320 && (height == 432 || height == 236)) // Plugy stats panel bg
-		return false;
-
+	//if (draw_mode == 5 && height == 7) // median exp bar
+	//	return false;
+	//if (draw_mode == 1 && width == 1024) // median esc
+	//	return false;
+	//if (draw_mode == 1 && height == 53 && width == 124) // median skilltab
+	//	return false;
+	//if (draw_mode == 5 && height == 48 && width == 48) // median skill bar
+	//	return false;
+	//if (draw_mode == 5 && height == 40 && width == 428) // median waypoint buttons
+	//	return false;
+	//if (draw_mode == 5 && height == 23 && width == 146) // median interface theme arrow
+	//	return false;
+	//if (draw_mode == 2 && height == 20 && width == 45) //overhead merc
+	//	return false;
+	//
+	//if (draw_mode == 5 && height == 5 && top == 14) // hireling & summon hp
+	//	return false;
+	//if (draw_mode == 5 && height == 256 && top == 153) // median drop deposit
+	//	return false;
+	//if (width == App.game.size.x || height == App.game.size.y) // FreeRes black bars
+	//	return false;
+	//
+	//if ((*d2::screen_shift == SCREENPANEL_LEFT || *d2::screen_shift == SCREENPANEL_BOTH) && width == 320 && (height == 432 || height == 236)) // Plugy stats panel bg
+	//	return false;
+	//if (draw_mode == 5 && height == 100 && width == 400) // dungeon countdown
+	//	return false;
+	//if (draw_mode == 5 && height == 26 && width == 162) // dungeon countdown
+	//	return false;
 	//if (draw_mode == 2 && width == 24 && height <= 24) // PD2 buff timer bg
 	//	return false;
 
 	if (*d2::esc_menu_open && height == 30) // In-game option sliders
 		return false;
-
+	if (draw_mode == 5)
+		return false;
 	if (draw_mode == 1 && height == 16 && (left == 11 || left == 10 || (*d2::screen_shift == SCREENPANEL_LEFT && left == App.game.size.x / 2 + 10))) // message bg
 		return true;
 
@@ -544,7 +554,7 @@ bool HDText::drawSolidRect(int left, int top, int right, int bottom, uint32_t co
 
 uint32_t HDText::getNormalTextWidth(const wchar_t* str, const int n_chars)
 {
-	if (App.game.draw_stage == DrawStage::Map && modules::MiniMap::Instance().isActive() && m_text_size == 6 && !*d2::automap_on)
+	if (App.game.draw_stage == DrawStage::Map && modules::MiniMap::Instance().isActive() && m_text_size == 6 && !d2::automapenabled)
 		return n_chars > 0 ? d2::getNormalTextNWidth(str, n_chars) : d2::getNormalTextWidth(str);
 
 	const auto size = getFont(m_text_size)->getTextSize(str, n_chars);

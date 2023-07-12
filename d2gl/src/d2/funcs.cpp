@@ -217,7 +217,10 @@ void __stdcall drawImageHooked(CellContext* cell, int x, int y, uint32_t gamma, 
 {
 	if (App.hd_cursor && App.game.draw_stage >= DrawStage::Cursor)
 		return;
-
+	if (App.game.draw_stage == DrawStage::Map) {
+		App.game.draw_stage = DrawStage::HUD;
+		App.context->onStageChange();
+	}
 	if (modules::HDText::Instance().drawImage(cell, x, y, draw_mode)) {
 		const auto pos = modules::MotionPrediction::Instance().drawImage(x, y, D2DrawFn::Image, gamma, draw_mode);
 		drawImage(cell, pos.x, pos.y, gamma, draw_mode, palette);
@@ -226,6 +229,10 @@ void __stdcall drawImageHooked(CellContext* cell, int x, int y, uint32_t gamma, 
 
 void __stdcall drawPerspectiveImageHooked(CellContext* cell, int x, int y, uint32_t gamma, int draw_mode, int screen_mode, uint8_t* palette)
 {
+	if (App.game.draw_stage == DrawStage::Map) {
+		App.game.draw_stage = DrawStage::HUD;
+		App.context->onStageChange();
+	}
 	const auto pos = modules::MotionPrediction::Instance().drawImage(x, y, D2DrawFn::PerspectiveImage);
 	drawPerspectiveImage(cell, pos.x, pos.y, gamma, draw_mode, screen_mode, palette);
 }
@@ -240,6 +247,10 @@ void __stdcall drawShiftedImageHooked(CellContext* cell, int x, int y, uint32_t 
 
 void __stdcall drawVerticalCropImageHooked(CellContext* cell, int x, int y, int skip_lines, int draw_lines, int draw_mode)
 {
+	if (App.game.draw_stage == DrawStage::Map) {
+		App.game.draw_stage = DrawStage::HUD;
+		App.context->onStageChange();
+	}
 	if (modules::HDText::Instance().isActive() && App.game.draw_stage >= DrawStage::UI) {
 		if (y < 150 || (*d2::screen_shift >= SCREENPANEL_LEFT && y < (int)*d2::screen_height - 100 && x < (int)*d2::screen_width / 2))
 			return;
@@ -257,6 +268,10 @@ void __stdcall drawClippedImageHooked(CellContext* cell, int x, int y, void* cro
 
 void __stdcall drawImageFastHooked(CellContext* cell, int x, int y, uint8_t palette_index)
 {
+	if (App.game.draw_stage == DrawStage::Map) {
+		App.game.draw_stage = DrawStage::HUD;
+		App.context->onStageChange();
+	}
 	const auto pos = modules::MotionPrediction::Instance().drawImage(x, y, D2DrawFn::ImageFast);
 	drawImageFast(cell, pos.x, pos.y, palette_index);
 }
