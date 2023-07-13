@@ -1,5 +1,5 @@
 # IF YOU HERE BECAUSE YOU WANT IT FOR MEDIAN XL
-MAKE SURE TO DOWNLOAD IT FROM RELEASES ON THE RIGHT AND ARCHIVE IS CALLED Release.zip ->
+DOWNLOAD **Release.zip** FROM HERE [D2GL-MXL](https://github.com/Pooquer/d2gl-mxl/releases)
 
 
 # Diablo 2 LoD Glide/DDraw to OpenGL Wrapper (D2GL)
