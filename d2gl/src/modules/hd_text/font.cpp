@@ -84,14 +84,13 @@ void Font::drawText(const wchar_t* str, glm::vec2 pos, uint32_t color, bool fram
 	auto text_offset = getTextOffset();
 
 	glm::vec2 offset = text_offset;
+	offset.x = text_offset.x = 0.0f;
 	if (framed) {
-		offset.x = text_offset.x = 0.0f;
+		offset.x += (m_text_size.x - m_line_width[0]) / 2.0f;
 		offset.y += (float)m_line_count * line_height - line_height;
 	}
 	if (m_align == TextAlign::Right)
 		offset.x += m_text_size.x - m_line_width[0];
-	else if (m_align == TextAlign::Center)
-		offset.x += (m_text_size.x - m_line_width[0]) / 2.0f;
 
 	uint32_t char_color = color;
 	if (m_bordered) {
