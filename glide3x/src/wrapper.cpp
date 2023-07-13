@@ -285,6 +285,8 @@ GrContext_t Wrapper::grSstWinOpen(FxU32 hwnd, GrScreenResolution_t screen_resolu
 	if (screen_resolution == GR_RESOLUTION_640x480)
 		App.game.size = { 640, 480 };
 	else if (screen_resolution == GR_RESOLUTION_800x600)
+		App.game.size = { 800, 600 };
+	else if (screen_resolution == GR_RESOLUTION_1024x768)
 		App.game.size = { 1024, 768 };
 	else {
 		if (App.game.custom_size.x != 0) {
