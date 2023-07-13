@@ -230,7 +230,7 @@ void __stdcall drawImageHooked(CellContext* cell, int x, int y, uint32_t gamma, 
 void __stdcall drawPerspectiveImageHooked(CellContext* cell, int x, int y, uint32_t gamma, int draw_mode, int screen_mode, uint8_t* palette)
 {
 	if (App.game.draw_stage == DrawStage::Map) {
-		App.game.draw_stage = DrawStage::HUD;
+		App.game.draw_stage = DrawStage::Map2;
 		App.context->onStageChange();
 	}
 	const auto pos = modules::MotionPrediction::Instance().drawImage(x, y, D2DrawFn::PerspectiveImage);
@@ -248,7 +248,7 @@ void __stdcall drawShiftedImageHooked(CellContext* cell, int x, int y, uint32_t 
 void __stdcall drawVerticalCropImageHooked(CellContext* cell, int x, int y, int skip_lines, int draw_lines, int draw_mode)
 {
 	if (App.game.draw_stage == DrawStage::Map) {
-		App.game.draw_stage = DrawStage::HUD;
+		App.game.draw_stage = DrawStage::Map2;
 		App.context->onStageChange();
 	}
 	if (modules::HDText::Instance().isActive() && App.game.draw_stage >= DrawStage::UI) {
@@ -269,7 +269,7 @@ void __stdcall drawClippedImageHooked(CellContext* cell, int x, int y, void* cro
 void __stdcall drawImageFastHooked(CellContext* cell, int x, int y, uint8_t palette_index)
 {
 	if (App.game.draw_stage == DrawStage::Map) {
-		App.game.draw_stage = DrawStage::HUD;
+		App.game.draw_stage = DrawStage::Map2;
 		App.context->onStageChange();
 	}
 	const auto pos = modules::MotionPrediction::Instance().drawImage(x, y, D2DrawFn::ImageFast);
