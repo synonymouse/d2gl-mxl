@@ -160,8 +160,8 @@ bool HDText::drawText(const wchar_t* str, int x, int y, uint32_t color, uint32_t
 {
 	if (!isActive() || !str)
 		return false;
-
-	if (y > 700 && (x == 195 || x == 200) && App.game.screen != GameScreen::Menu)
+	// if (y > 700 && (x == 195 || x == 200) && (App.game.screen != GameScreen::Menu || App.game.draw_stage == DrawStage::Map))
+	if (y > 700 && ((x == 195 || x == 200) || App.game.draw_stage == DrawStage::Map) && (App.game.screen != GameScreen::Menu))
 		return false;
 	auto font = getFont(m_text_size);
 	font->setShadow(1);
@@ -223,7 +223,7 @@ bool HDText::drawText(const wchar_t* str, int x, int y, uint32_t color, uint32_t
 			font = getFont(!App.mini_map.text_over || hidden ? 19 : 6);
 			const auto size = font->getTextSize(str);
 
-				pos.x = App.game.size.x - 12.0f - size.x;
+				pos.x = App.game.size.x - 16.0f - size.x;
 				pos.y = 22.0f + m_map_text_line * font->getFontSize() * 1.34f;
 				if (hidden) {
 					pos.x += 7.0f;
@@ -251,11 +251,15 @@ bool HDText::drawText(const wchar_t* str, int x, int y, uint32_t color, uint32_t
 		App.context->pushObject(m_object_bg);
 		font->setShadow(2);
 	}
-	if (App.game.screen != GameScreen::Menu && m_text_size == 1 && centered) {
-		pos.x += 6.0f;
-	}
-	if (m_text_size == 4)
-		pos.y += 2;
+	//if (App.game.screen != GameScreen::Menu && m_text_size == 1 && centered) {
+	//	pos.x += 3.0f;
+	//}
+	if (App.game.draw_stage != DrawStage::Map && App.game.screen != GameScreen::Menu && y < 650)
+		if (m_text_size == 6 && *d2::screen_shift > SCREENPANEL_RIGHT)
+			pos.x += 4.0f;
+		else if (m_text_size == 1 && *d2::screen_shift >= SCREENPANEL_RIGHT)
+			pos.x += 4.0f;
+
 	font->setMasking(m_masking);
 	font->setAlign(centered ? TextAlign::Center : TextAlign::Left);
 	font->drawText(str, pos, text_color);
@@ -275,10 +279,13 @@ bool HDText::drawFramedText(const wchar_t* str, int x, int y, uint32_t color, ui
 	if (!str || !isActive())
 		return false;
 
-	if (*d2::is_alt_clicked)
-		return true;
+	//if (*d2::is_alt_clicked)
+	//	return true;
 
 	const auto unit = d2::getSelectedUnit();
+	if (*d2::is_alt_clicked && unit && unit->dwType != d2::UnitType::Item)
+		return true;
+
 	if (unit) {
 		const bool is_monster = (unit->dwType == d2::UnitType::Monster && y == 32);
 		if (unit->dwType == d2::UnitType::Player || d2::isMercUnit(unit) || is_monster) {
@@ -343,6 +350,7 @@ bool HDText::drawFramedText(const wchar_t* str, int x, int y, uint32_t color, ui
 			pos.y = mid_y > cursor_y ? (float)(y - m_last_text_height) + 3.0f : (float)y - box_size.y;
 			m_object_bg->setColor(border_color, 2);
 		} else {
+			//mxl getSelectedItem is unused
 			// TODO: center skill hover text
 			if (line_count > 2)
 				pos.y = mid_y > cursor_y ? (float)(y - m_last_text_height) : (float)y - box_size.y;
@@ -478,8 +486,8 @@ bool HDText::drawSolidRect(int left, int top, int right, int bottom, uint32_t co
 	//	return false;
 	//if (draw_mode == 1 && width == 1024) // median esc
 	//	return false;
-	//if (draw_mode == 1 && height == 53 && width == 124) // median skilltab
-	//	return false;
+	if (draw_mode == 1 && height == 53 && width == 124) // median skilltab
+		return false;
 	//if (draw_mode == 5 && height == 48 && width == 48) // median skill bar
 	//	return false;
 	//if (draw_mode == 5 && height == 40 && width == 428) // median waypoint buttons
@@ -559,8 +567,8 @@ uint32_t HDText::getFramedTextSize(const wchar_t* str, uint32_t* width, uint32_t
 	const auto font = getFont(m_text_size);
 	const auto size = font->getTextSize(str);
 
-	*width = (uint32_t)(size.x + (m_text_size == 1 ? 10 : 0));
-	*height = m_text_size == 1 ? (font->getLineCount() * 18 + 2) : (uint32_t)size.y;
+	*width = (uint32_t)size.x;
+	*height = m_text_size == 1 ? (font->getLineCount() * 18) : (uint32_t)size.y;
 	m_last_text_width = *width;
 	m_last_text_height = *height;
 

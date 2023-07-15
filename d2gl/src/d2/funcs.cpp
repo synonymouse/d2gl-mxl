@@ -339,7 +339,11 @@ void __fastcall drawNormalTextHooked(const wchar_t* str, int x, int y, uint32_t 
 	// Glide mode light gray text appears black. So direct to dark gray.
 	if (ISGLIDE3X() && !App.hd_text && color == 15)
 		color = 5;
-
+	//uint32_t len = getNormalTextWidth(str);
+	//drawLine(x, y, x + len, y, 100, 255);
+	//drawLine(x, y - 15, x + len, y - 15, 100, 255);
+	//drawLine(x, y - 15, x, y, 100, 255);
+	//drawLine(x + len, y - 15, x + len, y, 100, 255);
 	const auto pos = modules::MotionPrediction::Instance().drawText(str, x, y, D2DrawFn::NormalText);
 	if (!modules::HDText::Instance().drawText(str, pos.x, pos.y, color, centered))
 		drawNormalText(str, pos.x, pos.y, color, centered);
@@ -375,7 +379,8 @@ uint32_t __fastcall getNormalTextWidthHooked(const wchar_t* str)
 
 uint32_t __fastcall getNormalTextNWidthHooked(const wchar_t* str, const int n_chars)
 {
-	if (wcscmp(str, L"") == 0 || n_chars <= 3)
+	//trace_log("%ws	%i", str, n_chars);
+	if (wcscmp(str, L"") == 0 || App.game.screen == GameScreen::Menu && n_chars <= 3)
 		return getNormalTextNWidth(str, n_chars);
 
 	if (modules::HDText::Instance().isActive())
