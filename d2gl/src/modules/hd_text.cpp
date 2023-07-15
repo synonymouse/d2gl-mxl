@@ -241,6 +241,7 @@ bool HDText::drawText(const wchar_t* str, int x, int y, uint32_t color, uint32_t
 
 	if (m_text_size == 13 && (x == 15 || (*d2::screen_shift == SCREENPANEL_LEFT && x == App.game.size.x / 2 + 15))) {
 		auto size = font->getTextSize(str);
+		size.y = size.y / 2;
 		const glm::vec2 padding = { 4.0f, 2.0f };
 		glm::vec2 back_pos = { pos.x, pos.y - size.y };
 
