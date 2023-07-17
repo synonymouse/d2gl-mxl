@@ -207,6 +207,25 @@ void uiDrawCursorItem()
 	App.context->onStageChange();
 }
 
+void __cdecl Sgd2fr_D2Client_SetTileCullingBound(CullingSpec* culling_spec, int left, int top, int right, int bottom)
+{
+	if (culling_spec == NULL) {
+		return;
+	}
+
+	SetRect(&culling_spec->draw_window_rect, left, top, right, bottom);
+
+	RECT* tile_culling_rect = &culling_spec->tile_culling_window;
+	SetRect(tile_culling_rect, -160, -160, 1024 + 160, 768 + 160);
+	//if (GetIsPerspectiveModeEnabled()) {
+	//	tile_culling_rect->top -= 160;
+	//	tile_culling_rect->left -= 320;
+	//	tile_culling_rect->right += 320;
+	//}
+
+	culling_spec->flags |= 0x1;
+}
+
 void uiDrawEnd()
 {
 	App.game.draw_stage = DrawStage::Cursor;
