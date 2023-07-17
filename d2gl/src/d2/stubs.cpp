@@ -86,6 +86,26 @@ __declspec(naked) void uiDrawBeginStub() // mxl
 	}
 }
 
+__declspec(naked) void Sgd2fr_SetTileCullingBoundPatch()
+{
+	__asm
+	{
+		push ebp
+		mov ebp, esp
+
+		push eax
+		push ecx
+		push edx
+		push dword ptr [ebp + 8]
+		push esi
+		call Sgd2fr_D2Client_SetTileCullingBound
+		add esp, 20
+
+		leave
+		ret 4
+	}
+}
+
 __declspec(naked) void uiDrawCursorItemStub()
 {
 	__asm
