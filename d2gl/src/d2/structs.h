@@ -384,7 +384,11 @@ struct UnitAny {
 		} v109;
 	};
 };
-
+struct CullingSpec {
+	uint32_t flags;
+	RECT draw_window_rect;
+	RECT tile_culling_window;
+};
 #pragma pack(push, 1)
 struct Room1 {
 	Room1** pRoomsNear;

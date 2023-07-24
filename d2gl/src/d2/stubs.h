@@ -30,6 +30,7 @@ void automapDrawEndStub();
 void uiDrawBeginStub();
 void uiDrawCursorItemStub();
 void uiDrawEndStub();
+void Sgd2fr_SetTileCullingBoundPatch();
 
 void drawUnitStubStack();
 void drawUnitStubESI();

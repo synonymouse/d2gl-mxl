@@ -19,6 +19,7 @@
 #include "pch.h"
 #include "font.h"
 #include "helpers.h"
+//#include "d2/funcs.h"
 
 namespace d2gl {
 
@@ -51,11 +52,11 @@ glm::vec2 Font::getTextSize(const wchar_t* str, const int max_chars)
 		if (str[char_num] == L'\n') {
 			m_line_width[line_num] = advance;
 			m_text_size.x = glm::max(m_text_size.x, advance);
-			if (str[char_num + 1] != L'\0') {
+			//if (str[char_num + 1] != L'\0') {
 				m_text_size.y += line_height;
 				advance = 0.0f;
 				line_num++;
-			}
+			//}
 		} else if (auto glyph = m_glyph_set->getGlyph(str[char_num])) {
 			advance += glyph->advance * m_scale;
 			if (str[char_num + 1] != L'\n' && str[char_num + 1] != L'\0')
@@ -69,8 +70,16 @@ glm::vec2 Font::getTextSize(const wchar_t* str, const int max_chars)
 	m_line_count = line_num + 1;
 	m_line_width[line_num] = advance;
 	m_text_size.x = glm::max(m_text_size.x, advance);
-	m_text_size.y += line_height - (line_height - m_font_size);
 
+	//m_text_size.y += line_height - (line_height - m_size);
+
+	m_first_line[str].m_line_width_x = m_line_width[0];
+	m_first_line[str].m_text_size_x = m_text_size.x;
+
+//	m_text_size.y += line_height - (line_height - m_font_size); v1.3.1
+
+
+	m_text_size.y += line_height;
 	return m_text_size;
 }
 
@@ -88,9 +97,9 @@ void Font::drawText(const wchar_t* str, glm::vec2 pos, uint32_t color, bool fram
 		offset.y += (m_font_size - m_size) / 2.0f;
 
 	if (m_align == TextAlign::Right)
-		offset.x += m_text_size.x - m_line_width[0];
+		offset.x += m_first_line[str].m_text_size_x - m_first_line[str].m_line_width_x;
 	else if (m_align == TextAlign::Center)
-		offset.x += (m_text_size.x - m_line_width[0]) / 2.0f;
+		offset.x += (m_first_line[str].m_text_size_x - m_first_line[str].m_line_width_x) / 2.0f;
 
 	uint32_t char_color = color;
 	if (m_bordered) {
@@ -127,13 +136,20 @@ void Font::drawText(const wchar_t* str, glm::vec2 pos, uint32_t color, bool fram
 			line_num++;
 
 			if (m_align == TextAlign::Right)
-				offset.x += m_text_size.x - m_line_width[line_num];
+				offset.x += m_first_line[str].m_text_size_x - m_line_width[line_num];
 			else if (m_align == TextAlign::Center)
-				offset.x += (m_text_size.x - m_line_width[line_num]) / 2.0f;
+				offset.x += (m_first_line[str].m_text_size_x - m_line_width[line_num]) / 2.0f;
 		} else
 			offset.x += drawChar(str[char_num], pos + offset, char_color) + letter_spacing;
 		char_num++;
 	}
+	//d2::drawLineHooked(pos.x, pos.y - line_height / 2, pos.x + m_line_width[line_num], pos.y - line_height / 2, 255, 254);
+
+	//d2::drawLineHooked(pos.x, pos.y - line_height, pos.x + m_line_width[line_num], pos.y - line_height, 255, 255); 
+	//d2::drawLineHooked(pos.x, pos.y, pos.x + m_line_width[line_num], pos.y, 255, 255);
+	//
+	//d2::drawLineHooked(pos.x, pos.y, pos.x, pos.y - line_height, 255, 255);
+	//d2::drawLineHooked(pos.x + m_line_width[line_num], pos.y, pos.x + m_line_width[line_num], pos.y - line_height, 255, 255);
 	m_line_count = 0;
 }
 
@@ -153,15 +169,24 @@ float Font::drawChar(wchar_t c, glm::vec2 pos, uint32_t color)
 		m_object->setSize(glyph->size * m_scale);
 		m_object->setTexIds({ glyph->tex_id, 0 });
 		m_object->setTexCoord(glyph->tex_coord);
+		if (m_shadow_level > 0) {
+			uint32_t m_shadow_color = 0x000000CC;
+			m_object->setPosition(object_pos + glm::min(4.0f * m_scale, 1.2f));
+			m_object->setColor(m_shadow_color);
+			m_object->setFlags(3, 0, m_masking);
+			App.context->pushObject(m_object);
+
+			// m_object->setExtra({ m_shadow_intensity, 0.0f });
+			// m_object->setFlags(3, m_shadow_level, m_masking);
+			// App.context->pushObject(m_object);
+		}
+
 		m_object->setPosition(object_pos);
 		m_object->setColor(color);
+		m_object->setExtra({ m_smoothness, m_weight });
 
-		if (m_shadow_level > 0) {
-			m_object->setExtra({ m_shadow_intensity, 0.0f });
-			m_object->setFlags(3, m_shadow_level, m_masking);
-			App.context->pushObject(m_object);
-		}
-		m_object->setExtra({ m_smoothness, weight });
+		//m_object->setExtra({ m_smoothness, weight }); v1.3.1 float weight = m_weight;
+
 		m_object->setFlags(3, 0, m_masking, m_bordered);
 		App.context->pushObject(m_object);
 

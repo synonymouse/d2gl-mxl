@@ -1,3 +1,7 @@
+# IF YOU HERE BECAUSE YOU WANT IT FOR MEDIAN XL
+DOWNLOAD **Release.zip** FROM HERE [D2GL-MXL](https://github.com/Pooquer/d2gl-mxl/releases)
+
+
 # Diablo 2 LoD Glide/DDraw to OpenGL Wrapper (D2GL)
 [![Github All Releases](https://img.shields.io/github/downloads/bayaraa/d2gl/total.svg)](https://github.com/bayaraa/d2gl/releases) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/bayaraa/d2gl/blob/master/LICENSE.md)
 
