@@ -36,6 +36,7 @@ struct FontCreateInfo {
 	float line_height = 0.0f;
 	float shadow_intensity = 0.0f;
 	glm::vec2 offset = { 0.0f, 0.0f };
+	float symbol_offset = 0.0f;
 	wchar_t color = 0;
 	bool bordered = false;
 };
@@ -47,14 +48,20 @@ class Font {
 	float m_scale = 1.0f;
 	wchar_t m_color = 0;
 	bool m_bordered = false;
+	float m_opacity = 1.0f;
 
 	float m_size = 10.0f;
+	float m_font_size = 10.0f;
 	float m_weight = 1.0f;
 	float m_line_height = 1.0f;
 	float m_letter_spacing = 0.0f;
 	float m_shadow_intensity = 0.9f;
 	glm::vec2 m_offset = { 0.0f, 0.0f };
+  
 	std::map<std::wstring, First_line> m_first_line;
+  
+	float m_symbol_offset = 0.0f;
+
 	float m_smoothness = 5.0f;
 	uint8_t m_shadow_level = 0;
 
@@ -69,22 +76,18 @@ public:
 	Font(GlyphSet* glyph_set, const FontCreateInfo& font_ci);
 	~Font() = default;
 
-	inline void setSize(float size) { m_size = size, m_scale = size / 32.0f, m_smoothness = size; }
-	inline void setWeight(float weight) { m_weight = weight; }
-	inline void setLetterSpacing(float letter_spacing) { m_letter_spacing = letter_spacing; }
-	inline void setLineHeight(float line_height) { m_line_height = line_height; }
-	inline void setOffset(glm::vec2 offset) { m_offset = offset; }
-
+	inline void setSize() { m_font_size = m_size * App.hd_text.scale.value, m_scale = m_font_size / 32.0f, m_smoothness = m_font_size; }
 	inline void setAlign(TextAlign align) { m_align = align; }
 	inline void setShadow(uint8_t level = 0) { m_shadow_level = level; }
 	inline void setMasking(bool masking) { m_masking = masking; }
+	inline void setOpacity(float opacity) { m_opacity = opacity; }
 
 	inline wchar_t getColor() { return m_color; }
-	inline float getFontSize() { return m_size; }
+	inline float getFontSize() { return m_font_size; }
 	inline float getWeight() { return m_weight; }
-	inline float getLineHeight() { return m_size * m_line_height; }
-	inline float getLetterSpacing() { return m_size * m_letter_spacing; }
-	inline glm::vec2 getTextOffset() { return m_size * m_offset; }
+	inline float getLineHeight() { return m_font_size * m_line_height; }
+	inline float getLetterSpacing() { return m_font_size * m_letter_spacing; }
+	inline glm::vec2 getTextOffset() { return m_font_size * m_offset; }
 	inline int getLineCount() { return m_line_count; }
 
 	glm::vec2 getTextSize(const wchar_t* str, const int max_chars = 0);

@@ -69,6 +69,7 @@ class HDText {
 	const uint32_t m_monster_hp = 0x56110BDD;
 
 	HDText();
+	~HDText() = default;
 
 public:
 	static HDText& Instance()
@@ -77,13 +78,14 @@ public:
 		return instance;
 	}
 
-	inline bool isActive() { return App.hd_text; }
+	inline bool isActive() { return App.hd_text.active; }
 	inline void setMVP(const glm::mat4& mvp) { m_mvp = mvp; }
 
 	void reset();
 	void update();
+	void updateFontSize();
 
-	bool drawText(const wchar_t* str, int x, int y, uint32_t color, uint32_t centered);
+	bool drawText(const wchar_t* str, int x, int y, uint32_t color, uint32_t centered, uint32_t trans_lvl = 5);
 	bool drawFramedText(const wchar_t* str, int x, int y, uint32_t color, uint32_t centered);
 	bool drawRectangledText(const wchar_t* str, int x, int y, uint32_t rect_transparency, uint32_t color);
 	bool drawSolidRect(int left, int top, int right, int bottom, uint32_t color, int draw_mode);
@@ -108,6 +110,7 @@ public:
 	void drawEntryText();
 
 	static void drawFpsCounter();
+	static void drawItemQuantity(bool draw, int x = 0, int y = 0);
 
 private:
 	void drawMonsterHealthBar(d2::UnitAny* unit);

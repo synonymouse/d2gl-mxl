@@ -225,7 +225,6 @@ FX_ENTRY void FX_CALL grGlideShutdown(void)
 }
 
 // Unused functions
-
 FX_ENTRY FxI32 FX_CALL grQueryResolutions(const GrResolution* resTemplate, GrResolution* output)
 {
 	assert(false);

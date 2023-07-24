@@ -501,6 +501,33 @@ __declspec(naked) void unitHoverEndPatch()
 	}
 }
 
+__declspec(naked) void drawInvItemPatch()
+{
+	__asm
+	{
+		mov currently_drawing_item, ebx
+		ret
+	}
+}
+
+__declspec(naked) void drawInvItemPatchEDI()
+{
+	__asm
+	{
+		mov currently_drawing_item, edi
+		ret
+	}
+}
+
+__declspec(naked) void drawInvItemPatchESI()
+{
+	__asm
+	{
+		mov currently_drawing_item, esi
+		ret
+	}
+}
+
 __declspec(naked) void loadUIImageStub()
 {
 	__asm
@@ -595,6 +622,7 @@ __declspec(naked) wchar_t* __fastcall getLevelName(int Level_no)
 		ret
 	}
 }
+
 // clang-format on
 
 }

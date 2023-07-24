@@ -45,6 +45,16 @@ namespace d2gl::d2 {
 #define SCREENPANEL_LEFT 2
 #define SCREENPANEL_BOTH 3
 
+#define STAT_HP 6
+#define STAT_MAXHP 7
+#define STAT_DMGREDUCTIONPCT 36
+#define STAT_MAGICDMGREDUCTIONPCT 37
+#define STAT_FIRERESIST 39
+#define STAT_LIGHTNINGRESIST 41
+#define STAT_COLDRESIST 43
+#define STAT_POISONRESIST 45
+#define STAT_ITEMQUANTITY 70
+
 enum class UnitType {
 	Player,
 	Monster,
@@ -272,7 +282,7 @@ struct MonsterData109 {
 	DWORD anEnchants[9];
 };
 
-struct ItemData {
+struct ItemData110 {
 	ItemQuality dwQuality;
 	DWORD _1[2];
 	DWORD dwItemFlags;
@@ -303,6 +313,13 @@ struct ItemData {
 	UnitAny* pOwner;
 };
 
+struct ItemData109 {
+	ItemQuality dwQuality;
+	DWORD _1[15];
+	BYTE BodyLocation;
+	BYTE ItemLocation;
+};
+
 struct UnitAny {
 	UnitType dwType;
 	union {
@@ -313,7 +330,7 @@ struct UnitAny {
 			DWORD dwMode;
 			union {
 				PlayerData* pPlayerData;
-				ItemData* pItemData;
+				ItemData110* pItemData;
 				MonsterData110* pMonsterData;
 				void* pObjectData;
 			};
@@ -354,7 +371,7 @@ struct UnitAny {
 			DWORD _3[13];
 			union {
 				PlayerData* pPlayerData;
-				ItemData* pItemData;
+				ItemData109* pItemData;
 				MonsterData109* pMonsterData;
 				void* pObjectData;
 			};

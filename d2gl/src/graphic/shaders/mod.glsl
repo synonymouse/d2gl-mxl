@@ -68,8 +68,9 @@ in vec2 v_Extra;
 
 uniform vec2 u_Scale;
 uniform vec4 u_TextMask;
-uniform bool u_IsMasking = false;
 uniform vec4 u_Viewport;
+uniform bool u_IsMasking = false;
+uniform bool u_IsGlide = true;
 
 float msdf(vec3 rgb, float smoothess, float weight)
 {
@@ -111,6 +112,8 @@ void main()
 					FragColor.a = 0.0;
 				else
 					FragColor.a *= 0.7;
+			} else {
+				FragColor.a *= v_Color2.a;
 			}
 		}
 		break;
@@ -124,6 +127,8 @@ void main()
 		case 6u:
 			FragColor = v_Color1;
 			float alpha = (v_TexCoord.x < 0.5) ? smoothstep(0.0, v_Extra.x, v_TexCoord.x) : smoothstep(1.0, v_Extra.y, v_TexCoord.x);
+			if (v_Flags.w == 1u)
+				alpha *= (v_TexCoord.y < 0.5) ? smoothstep(0.0, 0.3, v_TexCoord.y) : smoothstep(1.0, 0.7, v_TexCoord.y);
 			FragColor.a *= alpha;
 		break;
 		case 7u:
@@ -163,7 +168,7 @@ void main()
 			FragColor.a *= (float(v_Flags.z) * 0.01);
 	}
 
-	if (texture(u_MaskTexture, (gl_FragCoord.xy - u_Viewport.xy) / u_Viewport.zw).r > 0.1)
+	if (u_IsGlide && texture(u_MaskTexture, (gl_FragCoord.xy - u_Viewport.xy) / u_Viewport.zw).r > 0.1)
 		FragColor.a = 0.0;
 }
 
