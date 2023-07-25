@@ -139,7 +139,7 @@ void HDText::reset()
 void HDText::update()
 {
 	static bool mask = false;
-	if (App.game.screen == GameScreen::Menu) {
+	if (App.game.screen <= GameScreen::InGame) {
 		static glm::vec4 text_mask = glm::vec4(0.0f);
 
 		if (m_masking != mask || text_mask != m_text_mask) {
@@ -163,9 +163,14 @@ bool HDText::drawText(const wchar_t* str, int x, int y, uint32_t color, uint32_t
 	// if (y > 700 && (x == 195 || x == 200) && (App.game.screen != GameScreen::Menu || App.game.draw_stage == DrawStage::Map))
 	if (y > 700 && ((x == 195 || x == 200) || App.game.draw_stage == DrawStage::Map) && (App.game.screen != GameScreen::Menu))
 		return false;
+	if (App.game.draw_stage == DrawStage::UI && y == 600 && *d2::screen_shift >= SCREENPANEL_LEFT)
+		return false;
+
 	auto font = getFont(m_text_size);
 	font->setShadow(1);
 	glm::vec2 pos = { (float)x, (float)y };
+	if (App.hd_text.active && color == 4 && m_text_size == 3 && App.game.screen != GameScreen::Menu)
+		color = 16;
 	const auto def_color = font->getColor();
 	uint32_t text_color = g_text_colors.at(!color && def_color ? def_color : getColor(color));
 
@@ -215,7 +220,7 @@ bool HDText::drawText(const wchar_t* str, int x, int y, uint32_t color, uint32_t
 		} 
 	}
 	if (App.game.draw_stage == DrawStage::HUD && modules::MiniMap::Instance().isActive() && *d2::screen_shift == SCREENPANEL_NONE) {
-		if (!d2::automapenabled && m_text_size == 1 && x > 700 && y < 300) {
+		if (!d2::automapenabled && m_text_size == 1 && x > 750 && y < 300) {
 			map_text = true;
 			App.context->toggleDelayPush(true);
 
@@ -498,8 +503,8 @@ bool HDText::drawSolidRect(int left, int top, int right, int bottom, uint32_t co
 
 	//if (draw_mode == 5 && height == 7) // median exp bar
 	//	return false;
-	//if (draw_mode == 1 && width == 1024) // median esc
-	//	return false;
+	if (draw_mode == 1 && width == 1024) // median esc
+		return false;
 	if (draw_mode == 1 && height == 53 && width == 124) // median skilltab
 		return false;
 	//if (draw_mode == 5 && height == 48 && width == 48) // median skill bar
@@ -582,7 +587,7 @@ uint32_t HDText::getFramedTextSize(const wchar_t* str, uint32_t* width, uint32_t
 	const auto size = font->getTextSize(str);
 
 	*width = (uint32_t)size.x;
-	*height = m_text_size == 1 ? (font->getLineCount() * 18) : (uint32_t)size.y;
+	*height = m_text_size == 1 ? (font->getLineCount() * 17) : (uint32_t)size.y;
 	m_last_text_width = *width;
 	m_last_text_height = *height;
 
@@ -661,7 +666,10 @@ bool HDText::drawImage(d2::CellContext* cell, int x, int y, int draw_mode)
 	if (!cell_file)
 		return true;
 
-	if (App.game.screen == GameScreen::Menu && (cell_file->numcells == 1 || cell_file->numcells == 2 || cell_file->numcells == 4) && d2::getCellNo(cell) == 0) {
+	if (App.game.screen == GameScreen::Menu && (cell_file->numcells == 2) && d2::getCellNo(cell) == 0) {
+		if (x > 1024) // cell outside of screen size on tsw
+			return true;
+
 		const auto cell0 = cell_file->cells[0];
 		if (cell0->width != 256)
 			return true;
@@ -680,37 +688,38 @@ bool HDText::drawImage(d2::CellContext* cell, int x, int y, int draw_mode)
 				return true;
 			}
 		}
-	} else if (App.game.draw_stage == DrawStage::UI && *d2::esc_menu_open) {
-		const auto cell_no = d2::getCellNo(cell);
-		if (cell_file->cells[0]->height != g_text_size[0].large_text.x && cell_file->cells[0]->height != g_text_size[0].large_text.y &&
-			cell_file->cells[0]->height != g_text_size[m_lang_id].large_text.x && cell_file->cells[0]->height != g_text_size[m_lang_id].large_text.y)
-			return true;
-
-		for (auto& p : g_options_texts) {
-			const auto cell = cell_file->cells[p.cell_num];
-			if (p.cell_num == cell_file->numcells - 1 && cell->width == p.size.x && cell->height == p.size.y) {
-				if (cell_no == 0) {
-					auto image_width = cell->width + (p.cell_num > 0 ? cell_file->cells[0]->width : 0);
-					if (p.cell_num == 2)
-						image_width += cell_file->cells[1]->width;
-					glm::ivec2 pos = { x, y };
-					const auto old_size = m_text_size;
-					setTextSize(cell->height == g_text_size[0].large_text.x || cell->height == g_text_size[m_lang_id].large_text.x ? 3 : 2);
-
-					if (p.align == TextAlign::Center) {
-						auto text_width = getNormalTextWidth(p.str, 0);
-						pos.x = pos.x + image_width / 2 - text_width / 2;
-					} else if (p.align == TextAlign::Right) {
-						auto text_width = getNormalTextWidth(p.str, 0);
-						pos.x = pos.x + image_width - text_width;
-					}
-					drawText(p.str, pos.x, pos.y, draw_mode == 1 ? 16 : 0, 0);
-					setTextSize(old_size);
-				}
-				return false;
-			}
-		}
 	}
+	// else if (App.game.draw_stage == DrawStage::UI && *d2::esc_menu_open) {
+	//	const auto cell_no = d2::getCellNo(cell);
+	//	if (cell_file->cells[0]->height != g_text_size[0].large_text.x && cell_file->cells[0]->height != g_text_size[0].large_text.y &&
+	//		cell_file->cells[0]->height != g_text_size[m_lang_id].large_text.x && cell_file->cells[0]->height != g_text_size[m_lang_id].large_text.y)
+	//		return true;
+	//
+	//	for (auto& p : g_options_texts) {
+	//		const auto cell = cell_file->cells[p.cell_num];
+	//		if (p.cell_num == cell_file->numcells - 1 && cell->width == p.size.x && cell->height == p.size.y) {
+	//			if (cell_no == 0) {
+	//				auto image_width = cell->width + (p.cell_num > 0 ? cell_file->cells[0]->width : 0);
+	//				if (p.cell_num == 2)
+	//					image_width += cell_file->cells[1]->width;
+	//				glm::ivec2 pos = { x, y };
+	//				const auto old_size = m_text_size;
+	//				setTextSize(cell->height == g_text_size[0].large_text.x || cell->height == g_text_size[m_lang_id].large_text.x ? 3 : 2);
+	//
+	//				if (p.align == TextAlign::Center) {
+	//					auto text_width = getNormalTextWidth(p.str, 0);
+	//					pos.x = pos.x + image_width / 2 - text_width / 2;
+	//				} else if (p.align == TextAlign::Right) {
+	//					auto text_width = getNormalTextWidth(p.str, 0);
+	//					pos.x = pos.x + image_width - text_width;
+	//				}
+	//				drawText(p.str, pos.x, pos.y, draw_mode == 1 ? 16 : 0, 0);
+	//				setTextSize(old_size);
+	//			}
+	//			return false;
+	//		}
+	//	}
+	//
 
 	if (cell_file->numcells == 22 && cell_file->cells[0]->width == 14 && cell_file->cells[0]->height == 15) // Box Frames
 		return false;
@@ -723,35 +732,59 @@ bool HDText::drawShiftedImage(d2::CellContext* cell, int x, int y)
 	if (!isActive())
 		return true;
 
-	if (App.game.draw_stage == DrawStage::HUD && m_is_player_dead) {
-		const auto cell_file = d2::getCellFile(cell);
-		if (!cell_file)
+	const auto cell_file = d2::getCellFile(cell);
+	if (!cell_file)
+		return true;
+
+	if (App.game.draw_stage == DrawStage::HUD && cell_file->numcells == 6 && d2::getCellNo(cell) == 0) {
+		const auto cell0 = cell_file->cells[0];
+		if (cell0->width != 256)
 			return true;
 
-		const auto cell_no = d2::getCellNo(cell);
-		if (cell_file->cells[0]->height != g_text_size[0].large_text.x && cell_file->cells[0]->height != g_text_size[m_lang_id].large_text.x)
-			return true;
+		const auto cell1 = cell_file->cells[cell_file->numcells - 1];
+		for (auto& p : g_median_popups) {
+			if (p.size0.y == cell0->height && (cell_file->numcells == 1 || (p.size1.x == cell1->width && p.size1.y == cell1->height))) {
+				const glm::vec2 pos = { (float)(x - 1), (float)(y - p.size0.y - 1) };
+				const glm::vec2 size = { (float)(p.size0.x + p.size1.x + 2), (float)(p.size0.y + (cell_file->numcells > 2 ? p.size1.y : 0) + 2) };
 
-		for (auto& p : g_death_texts) {
-			const auto cell = cell_file->cells[p.cell_num];
-			if (p.cell_num == cell_file->numcells - 1 && cell->width == p.size.x && cell->height == p.size.y) {
-				if (cell_no == 0) {
-					auto image_width = cell->width + (p.cell_num > 0 ? cell_file->cells[0]->width : 0);
-					if (p.cell_num == 2)
-						image_width += cell_file->cells[1]->width;
-					glm::ivec2 pos = { x, y };
-					const auto old_size = m_text_size;
-					setTextSize(3);
+				const auto m1 = m_mvp * glm::vec4(pos, 0.0f, 1.0f);
+				const auto m2 = m_mvp * glm::vec4((pos + size), 0.0f, 1.0f);
+				m_text_mask = glm::vec4(m1.x, m1.y, m2.x, m2.y);
+				m_masking = true;
 
-					auto text_width = getNormalTextWidth(p.str, 0);
-					pos.x = pos.x + image_width / 2 - text_width / 2;
-					drawText(p.str, pos.x, pos.y, 17, 0);
-					setTextSize(old_size);
-				}
-				return false;
+				return true;
 			}
 		}
 	}
+	//if (App.game.draw_stage == DrawStage::HUD && m_is_player_dead) {
+	//	const auto cell_file = d2::getCellFile(cell);
+	//	if (!cell_file)
+	//		return true;
+	//
+	//	const auto cell_no = d2::getCellNo(cell);
+	//	if (cell_file->cells[0]->height != g_text_size[0].large_text.x && cell_file->cells[0]->height != g_text_size[m_lang_id].large_text.x)
+	//		return true;
+	//
+	//	for (auto& p : g_death_texts) {
+	//		const auto cell = cell_file->cells[p.cell_num];
+	//		if (p.cell_num == cell_file->numcells - 1 && cell->width == p.size.x && cell->height == p.size.y) {
+	//			if (cell_no == 0) {
+	//				auto image_width = cell->width + (p.cell_num > 0 ? cell_file->cells[0]->width : 0);
+	//				if (p.cell_num == 2)
+	//					image_width += cell_file->cells[1]->width;
+	//				glm::ivec2 pos = { x, y };
+	//				const auto old_size = m_text_size;
+	//				setTextSize(3);
+	//
+	//				auto text_width = getNormalTextWidth(p.str, 0);
+	//				pos.x = pos.x + image_width / 2 - text_width / 2;
+	//				drawText(p.str, pos.x, pos.y, 17, 0);
+	//				setTextSize(old_size);
+	//			}
+	//			return false;
+	//		}
+	//	}
+	//}
 
 	if (m_entry_text) {
 		const auto cell_file = d2::getCellFile(cell);

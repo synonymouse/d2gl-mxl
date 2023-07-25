@@ -76,7 +76,7 @@ glm::vec2 Font::getTextSize(const wchar_t* str, const int max_chars)
 	m_first_line[str].m_line_width_x = m_line_width[0];
 	m_first_line[str].m_text_size_x = m_text_size.x;
 
-//	m_text_size.y += line_height - (line_height - m_font_size); v1.3.1
+	//m_text_size.y += line_height - (line_height - m_font_size);// v1.3.1
 
 
 	m_text_size.y += line_height;
@@ -183,9 +183,9 @@ float Font::drawChar(wchar_t c, glm::vec2 pos, uint32_t color)
 
 		m_object->setPosition(object_pos);
 		m_object->setColor(color);
-		m_object->setExtra({ m_smoothness, m_weight });
+		//m_object->setExtra({ m_smoothness, m_weight });
 
-		//m_object->setExtra({ m_smoothness, weight }); v1.3.1 float weight = m_weight;
+		m_object->setExtra({ m_smoothness, weight }); //v1.3.1 float weight = m_weight;
 
 		m_object->setFlags(3, 0, m_masking, m_bordered);
 		App.context->pushObject(m_object);
