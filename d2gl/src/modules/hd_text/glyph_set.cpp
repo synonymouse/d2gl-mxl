@@ -1,4 +1,4 @@
-/*
+﻿/*
 D2GL: Diablo 2 LoD Glide/DDraw to OpenGL Wrapper.
 Copyright (C) 2023  Bayaraa
 
@@ -22,7 +22,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace d2gl {
 
-GlyphSet::GlyphSet(Texture* texture, const std::string& name)
+GlyphSet::GlyphSet(Texture* texture, const std::string& name, GlyphSet* symbol_set)
+	: m_symbols(symbol_set ? symbol_set->getGlyphes() : nullptr)
 {
 	auto buffer = helpers::loadFile("assets\\atlases\\" + name + "\\data.csv");
 	if (!buffer.size)
@@ -32,6 +33,8 @@ GlyphSet::GlyphSet(Texture* texture, const std::string& name)
 	uint32_t start_layer = 0;
 	std::string data((const char*)buffer.data, buffer.size);
 	auto lines = helpers::strToLines(data);
+	delete[] buffer.data;
+
 	for (auto& line : lines) {
 		auto cols = helpers::splitToVector(line);
 
@@ -54,16 +57,26 @@ GlyphSet::GlyphSet(Texture* texture, const std::string& name)
 		m_glyphes[cc].tex_id = start_layer;
 		m_glyphes[cc].tex_coord = coords / 1024.0f;
 	}
-
-	delete[] buffer.data;
 }
 
 const Glyph* GlyphSet::getGlyph(wchar_t c)
 {
+	m_is_symbol = false;
 	if (m_glyphes.find(c) != m_glyphes.end())
 		return &m_glyphes[c];
+
 	if (c == L'\xa0')
 		return &m_glyphes[L' '];
+
+	if (m_symbols) {
+		m_is_symbol = true;
+		if (m_symbols->find(c) != m_symbols->end())
+			return &m_symbols->at(c);
+
+		if (c > 0x20)
+			return &m_symbols->at(L'☹');
+	}
+
 	if (c > 0x20)
 		return &m_glyphes[L'?'];
 

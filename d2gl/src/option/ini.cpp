@@ -118,7 +118,7 @@ bool saveString(LPCSTR section, LPCSTR key, const std::string& val)
 
 void saveIni()
 {
-	char buf[3000] = { 0 };
+	char buf[3400] = { 0 };
 	std::ofstream out_file;
 	out_file.open(App.ini_file);
 
@@ -139,12 +139,16 @@ void saveIni()
 		"; Window position.\n"
 		"window_posx=%d\n"
 		"window_posy=%d\n\n"
+		"; Unlock Cursor (cursor will not locked within window).\n"
+		"unlock_cursor=%s\n\n"
+		"; Auto minimize when lose focus while in fullscreen.\n"
+		"auto_minimize=%s\n\n"
 		"; Dark style window title bar.\n"
 		"dark_mode=%s\n\n"
 		"; Vertical synchronization.\n"
 		"; Game fps adapt screen refresh rate (might have input lag).\n"
 		"vsync=%s\n\n"
-		"; Max Foreground FPS.\n"
+		"; Max Foreground FPS (if vsync is on this will be ignored).\n"
 		"; Limit maximum fps when game window is focused(active) (vsync must be disabled).\n"
 		"foreground_fps=%s\n"
 		"foreground_fps_value=%d\n\n"
@@ -160,6 +164,8 @@ void saveIni()
 		boolString(App.window.centered),
 		App.window.position.x,
 		App.window.position.y,
+		boolString(App.cursor.unlock),
+		boolString(App.window.auto_minimize),
 		boolString(App.window.dark_mode),
 		boolString(App.vsync),
 		boolString(App.foreground_fps.active),
@@ -168,19 +174,11 @@ void saveIni()
 		App.background_fps.range.value);
 	out_file << buf;
 
-	std::string shader_str = "";
-	for (size_t i = 0; i < App.shader.items.size(); i++) {
-		char label[100] = { 0 };
-		sprintf_s(label, "; %2d: %s", i, App.shader.items[i].name.c_str());
-		shader_str += std::string(label) + "\n";
-	}
-
 	static const char* graphic_setting =
 		"[Graphic]\n\n"
 		"; Upscale shader.\n"
-		"; Set one of following shaders.\n"
-		"%s"
-		"shader=%d\n\n"
+		"; RetroArch's slang shader preset files (.slangp).\n"
+		"shader_preset=%d\n\n"
 		"; Color grading (LUT) (only available in glide mode).\n"
 		"; Set one of 1-%d predefined luts. 0 = game default.\n"
 		"lut=%d\n\n"
@@ -189,8 +187,9 @@ void saveIni()
 		"sharpen_strength=%.3f\n"
 		"sharpen_clamp=%.3f\n"
 		"sharpen_radius=%.3f\n\n"
-		"; Fast approximate anti-aliasing.\n"
-		"fxaa=%s\n\n"
+		"; Fast approximate anti-aliasing (preset: 0-2).\n"
+		"fxaa=%s\n"
+		"fxaa_preset=%d\n\n"
 		"; Bloom effect.\n"
 		"bloom=%s\n"
 		"bloom_exposure=%.3f\n"
@@ -200,15 +199,15 @@ void saveIni()
 		"stretched_vertical=%s\n\n\n";
 
 	sprintf_s(buf, graphic_setting,
-		shader_str.c_str(),
-		App.shader.selected,
+		App.shader.preset.c_str(),
 		App.lut.items.size() - 1,
 		App.lut.selected,
 		boolString(App.sharpen.active),
 		App.sharpen.strength.value,
 		App.sharpen.clamp.value,
 		App.sharpen.radius.value,
-		boolString(App.fxaa),
+		boolString(App.fxaa.active),
+		App.fxaa.presets.selected,
 		boolString(App.bloom.active),
 		App.bloom.exposure.value,
 		App.bloom.gamma.value,
@@ -221,7 +220,8 @@ void saveIni()
 		"; HD cursor in game & menu screen.\n"
 		"hd_cursor=%s\n\n"
 		"; HD in game text.\n"
-		"hd_text=%s\n\n"
+		"hd_text=%s\n"
+		"hd_text_scale=%.3f\n\n"
 		//"; HD life & mana orbs.\n"
 		//"hd_orbs=%s\n"
 		//"hd_orbs_centered=%s\n\n"
@@ -236,14 +236,17 @@ void saveIni()
 		"skip_intro=%s\n\n"
 		"; Auto /nopickup option on launch (exclude 1.09d).\n"
 		"no_pickup=%s\n\n"
+		"; Show item quantity on bottom left corner of icon.\n"
+		"show_item_quantity=%s\n\n"
+		"; Show monster resistances on hp bar.\n"
+		"show_monster_res=%s\n\n"
 		"; Show FPS Counter (bottom center).\n"
-		"show_fps=%s\n\n"
-		"; Unlock Cursor (cursor will not locked within window).\n"
-		"unlock_cursor=%s\n\n\n";
+		"show_fps=%s\n\n\n";
 
 	sprintf_s(buf, feature_setting,
 		boolString(App.hd_cursor),
-		boolString(App.hd_text),
+		boolString(App.hd_text.active),
+		App.hd_text.scale.value,
 		// boolString(App.hd_orbs.active),
 		// boolString(App.hd_orbs.centered),
 		boolString(App.mini_map.active),
@@ -253,8 +256,9 @@ void saveIni()
 		boolString(App.motion_prediction),
 		boolString(App.skip_intro),
 		boolString(App.no_pickup),
-		boolString(App.show_fps),
-		boolString(App.cursor.unlock));
+		boolString(App.show_item_quantity),
+		boolString(App.show_monster_res),
+		boolString(App.show_fps));
 	out_file << buf;
 
 	static const char* other_setting =
@@ -273,8 +277,8 @@ void saveIni()
 		"load_dlls_late=%s\n";
 
 	sprintf_s(buf, other_setting,
-		App.gl_ver_major,
-		App.gl_ver_minor,
+		App.gl_ver.x,
+		App.gl_ver.y,
 		boolString(App.use_compute_shader),
 		App.frame_latency,
 		App.dlls_early.c_str(),
@@ -294,9 +298,6 @@ void loadIni()
 		GetSystemMetrics(SM_CYVIRTUALSCREEN),
 	};
 
-	for (auto& shader : g_shader_upscale)
-		App.shader.items.push_back({ shader.name });
-
 	App.lut.items.push_back({ "Game Default" });
 	for (int i = 1; i <= 14; i++) {
 		char label[50] = { 0 };
@@ -306,8 +307,10 @@ void loadIni()
 
 	if (helpers::fileExists(App.ini_file)) {
 		App.window.fullscreen = getBool("Screen", "fullscreen", App.window.fullscreen);
+		App.window.auto_minimize = getBool("Screen", "auto_minimize", App.window.auto_minimize);
 		App.window.dark_mode = getBool("Screen", "dark_mode", App.window.dark_mode);
 		App.vsync = getBool("Screen", "vsync", App.vsync);
+		App.cursor.unlock = getBool("Screen", "unlock_cursor", App.cursor.unlock);
 
 		App.window.size.x = getInt("Screen", "window_width", App.window.size.x, 800, App.desktop_resolution.z);
 		App.window.size.y = getInt("Screen", "window_height", App.window.size.y, 600, App.desktop_resolution.w);
@@ -322,9 +325,10 @@ void loadIni()
 		App.background_fps.active = getBool("Screen", "background_fps", App.background_fps.active);
 		App.background_fps.range.value = getInt("Screen", "background_fps_value", App.background_fps.range.value, App.background_fps.range.min, App.background_fps.range.max);
 
-		App.shader.selected = getInt("Graphic", "shader", App.shader.selected, 0, App.shader.items.size() - 1);
+		App.shader.preset = getString("Graphic", "shader_preset", App.shader.preset);
 		App.lut.selected = getInt("Graphic", "lut", App.lut.selected, 0, App.lut.items.size() - 1);
-		App.fxaa = getBool("Graphic", "fxaa", App.fxaa);
+		App.fxaa.active = getBool("Graphic", "fxaa", App.fxaa.active);
+		App.fxaa.presets.selected = getInt("Graphic", "fxaa_preset", App.fxaa.presets.selected, 0, 2);
 
 		App.sharpen.active = getBool("Graphic", "sharpen", App.sharpen.active);
 		App.sharpen.strength.value = getFloat("Graphic", "sharpen_strength", App.sharpen.strength);
@@ -339,7 +343,8 @@ void loadIni()
 		App.viewport.stretched.y = getBool("Graphic", "stretched_vertical", App.viewport.stretched.y);
 
 		App.hd_cursor = getBool("Feature", "hd_cursor", App.hd_cursor);
-		App.hd_text = getBool("Feature", "hd_text", App.hd_text);
+		App.hd_text.active = getBool("Feature", "hd_text", App.hd_text.active);
+		App.hd_text.scale.value = ISHDTEXT() ? 1.0f : getFloat("Feature", "hd_text_scale", App.hd_text.scale);
 
 		// App.hd_orbs.active = getBool("Feature", "hd_orbs", App.hd_orbs.active);
 		// App.hd_orbs.centered = getBool("Feature", "hd_orbs_centered", App.hd_orbs.centered);
@@ -352,13 +357,13 @@ void loadIni()
 		App.motion_prediction = getBool("Feature", "motion_prediction", App.motion_prediction);
 		App.skip_intro = getBool("Feature", "skip_intro", App.skip_intro);
 		App.no_pickup = getBool("Feature", "no_pickup", App.no_pickup);
+		App.show_item_quantity = getBool("Feature", "show_item_quantity", App.show_item_quantity);
+		App.show_monster_res = getBool("Feature", "show_monster_res", App.show_monster_res);
 		App.show_fps = getBool("Feature", "show_fps", App.show_fps);
-		App.cursor.unlock = getBool("Feature", "unlock_cursor", App.cursor.unlock);
 
-		App.gl_ver_major = getInt("Other", "gl_ver_major", App.gl_ver_major, 3, 4);
-		App.gl_ver_minor = getInt("Other", "gl_ver_minor", App.gl_ver_minor, 0, 6);
-		if (App.gl_ver_major == 3)
-			App.gl_ver_minor = 3;
+		App.gl_ver.x = getInt("Other", "gl_ver_major", App.gl_ver.x, 3, 4);
+		App.gl_ver.y = getInt("Other", "gl_ver_minor", App.gl_ver.y, 0, 6);
+		App.gl_ver.y = App.gl_ver.x == 3 ? 3 : App.gl_ver.y;
 
 		App.use_compute_shader = getBool("Other", "use_compute_shader", App.use_compute_shader);
 		App.frame_latency = getInt("Other", "frame_latency", App.frame_latency, 1, 5);

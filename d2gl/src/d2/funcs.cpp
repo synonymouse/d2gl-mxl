@@ -142,17 +142,22 @@ wchar_t* getMonsterName(UnitAny* unit)
 	return isVer(V_109d) ? unit->v109.pMonsterData->wName : unit->v110.pMonsterData->wName;
 }
 
-ItemQuality getItemQuality(UnitAny* unit)
-{
-	return isVer(V_109d) ? unit->v109.pItemData->dwQuality : unit->v110.pItemData->dwQuality;
-}
-
 bool isMercUnit(UnitAny* unit)
 {
 	if (unit->dwType != d2::UnitType::Monster || isVer(V_109d))
 		return false;
 
 	return unit->v110.dwClassId == MERC_A1 || unit->v110.dwClassId == MERC_A2 || unit->v110.dwClassId == MERC_A3 || unit->v110.dwClassId == MERC_A4 || unit->v110.dwClassId == MERC_A5;
+}
+
+ItemQuality getItemQuality(UnitAny* unit)
+{
+	return isVer(V_109d) ? unit->v109.pItemData->dwQuality : unit->v110.pItemData->dwQuality;
+}
+
+BYTE getItemLocation(UnitAny* unit)
+{
+	return isVer(V_109d) ? unit->v109.pItemData->ItemLocation : unit->v110.pItemData->ItemLocation;
 }
 
 CellFile* getCellFile(CellContext* cell)
@@ -244,6 +249,8 @@ void __stdcall drawImageHooked(CellContext* cell, int x, int y, uint32_t gamma, 
 		const auto pos = modules::MotionPrediction::Instance().drawImage(x, y, D2DrawFn::Image, gamma, draw_mode);
 		drawImage(cell, pos.x, pos.y, gamma, draw_mode, palette);
 	}
+
+	modules::HDText::drawItemQuantity(true);
 }
 
 void __stdcall drawPerspectiveImageHooked(CellContext* cell, int x, int y, uint32_t gamma, int draw_mode, int screen_mode, uint8_t* palette)
@@ -306,6 +313,8 @@ void __stdcall drawSolidRectExHooked(int left, int top, int right, int bottom, u
 	auto offset = modules::MotionPrediction::Instance().drawSolidRect();
 	if (!modules::HDText::Instance().drawSolidRect(left - offset.x, top - offset.y, right - offset.x, bottom - offset.y, color, draw_mode))
 		drawSolidRectEx(left - offset.x, top - offset.y, right - offset.x, bottom - offset.y, color, draw_mode);
+
+	modules::HDText::drawItemQuantity(false, left, bottom);
 }
 
 void __stdcall drawLineHooked(int x_start, int y_start, int x_end, int y_end, uint8_t color, uint8_t alpha)
@@ -356,7 +365,7 @@ void __fastcall takeScreenShotHooked()
 void __fastcall drawNormalTextHooked(const wchar_t* str, int x, int y, uint32_t color, uint32_t centered)
 {
 	// Glide mode light gray text appears black. So direct to dark gray.
-	if (ISGLIDE3X() && !App.hd_text && color == 15)
+	if (ISGLIDE3X() && !App.hd_text.active && color == 15)
 		color = 5;
 	//uint32_t len = getNormalTextWidth(str);
 	//drawLine(x, y, x + len, y, 100, 255);
@@ -371,7 +380,7 @@ void __fastcall drawNormalTextHooked(const wchar_t* str, int x, int y, uint32_t 
 void __fastcall drawNormalTextExHooked(const wchar_t* str, int x, int y, uint32_t color, uint32_t centered, uint32_t trans_lvl)
 {
 	const auto pos = modules::MotionPrediction::Instance().drawText(str, x, y, D2DrawFn::NormalTextEx);
-	if (!modules::HDText::Instance().drawText(str, pos.x, pos.y, color, centered))
+	if (!modules::HDText::Instance().drawText(str, pos.x, pos.y, color, centered, trans_lvl))
 		drawNormalTextEx(str, pos.x, pos.y, color, centered, trans_lvl);
 }
 

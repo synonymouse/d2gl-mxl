@@ -3,10 +3,11 @@ DOWNLOAD **Release.zip** FROM HERE [D2GL-MXL](https://github.com/Pooquer/d2gl-mx
 
 
 # Diablo 2 LoD Glide/DDraw to OpenGL Wrapper (D2GL)
+[![Github All Releases](https://img.shields.io/github/downloads/bayaraa/d2gl/total.svg)](https://github.com/bayaraa/d2gl/releases) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/bayaraa/d2gl/blob/master/LICENSE.md)
 
 D2GL is a Diablo 2 LoD Glide/DDraw to OpenGL wrapper that translates glide/ddraw calls to OpenGL calls. This makes D2 run better on modern hardware/OS and easier to switch between fullscreen and windowed modes, and resolves certain window and cursor-related issues. Additionally, it includes several libretro shaders for upscaling to higher resolutions, and allows for in-game text to be displayed in high-definition, D2DX's motion prediction, other QOL features.
 
-### Bug/Crash Report (***Important!***)
+### 🚩 Bug/Crash Report (***Important!***)
 
 Please don't just say it crashes. I can't do anything without additional information!  
 If you want to report bug or crash please include details about your system (OS, hardware), what you doing when crash occured, are other mods included (like plugy, basemod etc), is crashing on both wrappers (glide, ddraw).  
@@ -15,7 +16,7 @@ Also run game.exe with `-3dfx -log` it will create `d2gl.log` and attach this al
 ## Features
 
 - In-Game Option Menu(`Ctrl+O`) to change settings on fly.
-- Upscale to higher resolution using pre-included libretro's shader.
+- Upscale to higher resolution using RetroArch's slang shaders.
 - Switch some parts in game to high-definition (all text, cursor etc.).
 - Unlocked FPS (menu screen 45fps / ingame unlocked).
 - Modified version of "D2DX's Unit/Weather Motion Predictor" feature (better with v-sync on).
@@ -46,16 +47,17 @@ Diablo II modding community (The Phrozen Keep) and **Everyone** who makes d2 mod
 
 - SGD2FreeRes D2 Custom Resolution (Mir Drualga).
 - D2DX's Unit/Weather Motion Predictor (Bolrog).
-- Libretro's common-shaders.
-- Detours (Microsoft).
+- Libretro's slang shaders (RetroArch).
 - The OpenGL Extension Wrangler Library (Brian Paul).
 - OpenGL Mathematics (GLM) (G-Truc Creation).
-- FXAA implementation by Timothy Lottes (NVIDIA Corporation).
+- FXAA implementation by Timothy Lottes (NVIDIA).
 - Dear ImGui (Omar Cornut).
 - stb_image, stb_image_write (Sean Barrett).
 - MurmurHash3 (Austin Appleby).
 - MSDF Atlas Generator (Chlumsky).
 - Shader Minifier (laurentlb).
+- SPIRV-Cross, glslang (KhronosGroup).
+- Detours (Microsoft).
 
 ## Some Screenshots
 
