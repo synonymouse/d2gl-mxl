@@ -1,30 +1,30 @@
 # IF YOU HERE BECAUSE YOU WANT IT FOR MEDIAN XL
-DOWNLOAD **Release.zip** FROM HERE [D2GL-MXL](https://github.com/Pooquer/d2gl-mxl/releases)
+### DOWNLOAD **Release.zip** FROM HERE [D2GL-MXL](https://github.com/Pooquer/d2gl-mxl/releases)
 - Drop files into Diablo II folder (where D2Sigma.dll is located)
 
-Glide mode if you using mxl launcher: 
+### Glide mode if you using mxl launcher: 
 - Hit launcher settings
 - Run Video Test
 - Choose **Glide**
 - In launcher settings in **Video Mode** choose: **3DFX Glide**
 - Uncheck **Run the game in windowed mode**
 
-Glide mode if you using shortcut of Game.exe:
+### Glide mode if you using shortcut of Game.exe:
 - Run Video Test (it's in D2 folder)
 - Choose **Glide**
 - Add to your shortcut -3dfx
 - Remove from your shortcut -w, example of shortcut: "D:\Games\Diablo II\Game.exe" -3dfx -skiptobnet -nosound
 
-DDraw mode if you using mxl launcher: 
+### DDraw mode if you using mxl launcher: 
 - It only starts vanilla ddraw(coz it adds -w by default), so you need to run through shortcut 👇
 
-DDraw mode if you using shortcut of Game.exe:
+### DDraw mode if you using shortcut of Game.exe:
 - Run Video Test (it's in D2 folder)
 - Choose **DDraw(D2GL)**
-- Remove from your shortcut -3dfx
+- Remove/don't add -3dfx to your shortcut
 - Remove from your shortcut -w, example of shortcut: "D:\Games\Diablo II\Game.exe" -skiptobnet -nosound
 
-If you having troubles like *black screen*, *nothing appears on screen, but i can hear sound from main menu*, etc:
+### If you having troubles like *black screen*, *nothing appears on screen, but i can hear sound from main menu*, etc:
 - Run Video Test
 
 # Diablo 2 LoD Glide/DDraw to OpenGL Wrapper (D2GL)
