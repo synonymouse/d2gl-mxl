@@ -169,7 +169,7 @@ bool HDText::drawText(const wchar_t* str, int x, int y, uint32_t color, uint32_t
 	auto font = getFont(m_text_size);
 	font->setShadow(1);
 	glm::vec2 pos = { (float)x, (float)y };
-	if (App.hd_text.active && color == 4 && m_text_size == 3 && App.game.screen != GameScreen::Menu)
+	if (color == 4 && m_text_size == 3 && App.game.screen != GameScreen::Menu)
 		color = 8;
 	const auto def_color = font->getColor();
 	uint32_t text_color = g_text_colors.at(!color && def_color ? def_color : getColor(color));
